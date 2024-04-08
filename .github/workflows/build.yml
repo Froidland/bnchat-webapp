@@ -1,15 +1,20 @@
-name: PR build and test
+name: Build
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build:
+    env: 
+      VITE_API_URL: ${{ secrets.API_URL }}
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.3
@@ -26,8 +31,5 @@ jobs:
 
       - name: Build app
         run: pnpm run build
-
-      # - name: Run tests
-      #   run: pnpm run test
       
         

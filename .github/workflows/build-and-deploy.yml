@@ -1,41 +1,33 @@
-name: Build
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - deploy
 
 jobs:
-  build:
-    env: 
-      VITE_API_URL: ${{ secrets.API_URL }}
+  deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.5.3
 
-      - name: Setup Node.js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.5.3
+      
+      - name: Install Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 20.x
+          node-version: 20  # Choose the Node.js version you're using in your project
 
-      - name: Setup pnpm
-        run: |
-          npm install -g pnpm
-          pnpm install
+      - name: Install dependencies
+        run: npm install  # Or yarn install if you're using Yarn
 
-      - name: Build app
-        run: pnpm run build
-        
-      # - name: Install SSH Key
-      #   uses: shimataro/ssh-key-action@v2.5.1
-      #   with:
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-      
-      # - name: Rsync into the server
-      #   run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/chat.pancho.moe/
-      
-        
+      - name: Build
+        run: npm run build  # Or yarn build if you're using Yarn
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        with:
+          branch: gh-pages  # Branch to deploy to (create if doesn't exist)
+          folder: dist      # Folder where your built files are located
+          cleanup: false     # Keep existing files in the deployment branch
+          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
